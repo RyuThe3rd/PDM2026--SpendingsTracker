@@ -1,17 +1,11 @@
-# lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson
+Cada um escrever na sua própria branch depois manda mensagem no grupo quando fizer PR para fazer merge na main
 
-A new Flutter project.
+é só cobrir:
+1- As telas (está no documento)
+2- Diagrama de casos de uso
+3- Requisitos Funcionais
 
-## Getting Started
+sobre a AI do backend peço para utilizarem dependency injection porque quero mudar no futuro para um modelo naquele vps free tier da oracle.
+Mas no momento irei pagar pela api do deepseek since it's the cheapest. Irei disponibilizar a api que servirá de proxy para a api do deepseek
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
