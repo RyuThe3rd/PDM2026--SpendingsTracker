@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson.iml" filepath="$PROJECT_DIR$/lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson_android.iml" filepath="$PROJECT_DIR$/android/lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson_android.iml" />
+    </modules>
+  </component>
+</project>
