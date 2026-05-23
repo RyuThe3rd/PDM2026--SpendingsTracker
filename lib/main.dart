@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: {OS.language == 'pt' ?'Finança Local' : 'Spendings Tracker'},
+      title: "${OS.language == 'pt' ?'Finança Local' : 'Spendings Tracker'}",
       theme: ThemeData(
         // This is the theme of your application.
         //
