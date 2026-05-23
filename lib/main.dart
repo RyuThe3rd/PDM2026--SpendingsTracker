@@ -1,11 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
   //fala com o OS mas sem necessariamente iniciar a renderização no flutter engine
   WidgetsFlutterBinding.ensureInitialized();
 
   //chamar o serviço de coletar mensagens
-  //inicializar Firebase
+
+  /*Rui: inicializar Firebase para android
+  (não temos firebase options pq eu não vou rodar npm install
+  e não precisamos de web ou IOS)
+  */
+  await Firebase.initializeApp(
+  );
 
   runApp(const MyApp());
 }
