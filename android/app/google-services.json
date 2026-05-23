@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "439822594322",
+    "project_id": "financa-local",
+    "storage_bucket": "financa-local.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:439822594322:android:7909f16ce81b76a4cb43cb",
+        "android_client_info": {
+          "package_name": "com.example.lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwdg6xLumA2hqCMaAEWuW7b1wU3rXS3yA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
