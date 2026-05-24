@@ -1,11 +1,12 @@
-import 'listaDeImports.dart';
+import '../../listaDeImports.dart';
 
 
-class User {
+class User extends {
 
   int _id;
   String _nome;
   String _apelido;
+  String _nrDeTelefone;
 
   Tipo _tipo;
   /*Rui: se for admin é a mesma coisa que premium
@@ -19,12 +20,14 @@ class User {
   User({required id,
     required String nome,
     required String apelido,
+    required String nrDeTelefone,
     bool? premium = false
   }):
       this._id = id,
         this._nome = nome,
         this._apelido = apelido,
         this._premium = premium,
+        this._nrDeTelefone = nrDeTelefone,
         this._tipo = Tipo.Usuario;
 
   bool get premium => _premium!;

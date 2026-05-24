@@ -1,12 +1,12 @@
 import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart ';
+import 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/repositorios/transacoesRepo.dart';
 
 void main() async {
   //fala com o OS mas sem necessariamente iniciar a renderização no flutter engine
   WidgetsFlutterBinding.ensureInitialized();
-
-  //chamar o serviço de coletar mensagens
 
   /*Rui: inicializar Firebase para android
   (não temos firebase options pq eu não vou rodar npm install
@@ -14,6 +14,11 @@ void main() async {
   */
   await Firebase.initializeApp(
   );
+
+  //chamar o serviço de coletar mensagens
+  final transacoesRepo = TransacoesRepo();
+
+  await transacoesRepo.sincronizarSms();
 
   runApp(const MyApp());
 }
@@ -47,7 +52,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const TelaLogin(),
       routes: <String, WidgetBuilder>{
         '/Admin' : (contexto) => TelaAdmin(),
         '/User' : (contexto) => TelaUser(),
