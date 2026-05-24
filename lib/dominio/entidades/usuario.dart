@@ -32,6 +32,12 @@ class Usuario{
 
   bool get premium => _premium!;
 
+  String get nrDeTelefone => _nrDeTelefone;
+
+  set nrDeTelefone(String value) {
+    _nrDeTelefone = value;
+  }
+
   /*
   Rui: função para saber se o user tem acesso premium
    (pode ser admin ou user premium)

@@ -24,7 +24,7 @@ class ColetarTransacoes {
           // Extraímos os dados da mensagem para um Map
           transacoesExtraidas.add({
             'id_sms': msg.id,
-            'remetente': msg.address,
+            'remetente': msg.address, // fonte??
             'corpo': msg.body,
             'data': msg.date ?? DateTime.now(),
             'valor': _extrairValor(msg.body ?? ""),

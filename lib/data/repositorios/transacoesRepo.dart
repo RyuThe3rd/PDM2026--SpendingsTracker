@@ -6,6 +6,7 @@ import '../servicos/coletarTransacoes.dart';
 class TransacoesRepo {
   FirebaseFirestore? _firestore;
   final ColetarTransacoes _coletorSMS = ColetarTransacoes();
+  final List<Map<String, dynamic>> _transacoesCache = [];
 
   //Rui: vai receber dependência do TransacoesProvider
   TransacoesRepo({
@@ -31,7 +32,6 @@ class TransacoesRepo {
       }
     }
   }
-  final List<Map<String, dynamic>> _transacoesCache = [];
 
   void adicionarTransacao(Map<String, dynamic> transacao) {
     _transacoesCache.add(transacao);

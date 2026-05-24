@@ -1,5 +1,5 @@
-import '../../dominio/entidades/userpremium.dart';
 import '../../listaDeImports.dart';
+
 
 class UserPremiumModelo extends UserPremium {
   UserPremiumModelo({

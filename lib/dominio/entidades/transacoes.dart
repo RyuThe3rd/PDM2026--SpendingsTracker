@@ -1,8 +1,4 @@
-enum TipoTransacao {
-  Deposito,
-  Levantamento,
-  Consulta
-}
+import '../../listaDeImports.dart';
 
 enum FonteTransacao{
   Banco,
@@ -25,6 +21,30 @@ class Transacoes {
         this._valor = valor,
         this._data = data == null ? DateTime.now() : data
   ;
+
+  DateTime get data => _data;
+
+  set data(DateTime value) {
+    _data = value;
+  }
+
+  double get valor => _valor;
+
+  set valor(double value) {
+    _valor = value;
+  }
+
+  FonteTransacao get fonte => _fonte;
+
+  set fonte(FonteTransacao value) {
+    _fonte = value;
+  }
+
+  TipoTransacao get tipo => _tipo;
+
+  set tipo(TipoTransacao value) {
+    _tipo = value;
+  }
 
 
 }

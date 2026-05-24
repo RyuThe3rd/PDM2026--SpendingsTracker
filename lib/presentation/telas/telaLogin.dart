@@ -1,6 +1,7 @@
 import '../../listaDeImports.dart';
 import 'package:flutter/material.dart';
 
+
 class TelaLoginCadastro extends StatefulWidget {
 
 
@@ -59,7 +60,10 @@ bool loginEstado = context.watch<ProviderGlobal>().login == 'azul';
                       child: Text(
                         "Criar Conta",
                         style: TextStyle(
-                          color: Color.fromARGB(255, 23, 24, 106)
+                          color: loginEstado?
+                          Color.fromARGB(255, 23, 24, 106):
+                          Color.fromARGB(255, 23, 24, 106),
+
                         ),
                       ),
                     ),

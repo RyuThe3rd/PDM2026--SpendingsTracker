@@ -1,5 +1,5 @@
 import '../../listaDeImports.dart';
-import '../contratos/interfaceTransasoes.dart';
+
 
 class MonitorarGastosImpl {
   InterfaceTransacoes _transacoes;
@@ -26,9 +26,10 @@ class MonitorarGastosImpl {
       }
 
       resultado[diasDaSemana[i]] = {
+        'inicio': inicio,
         'depositado': depositado,
         'levantado': levantado,
-        'final': depositado - levantado,
+        'final': (inicio + depositado - levantado),
       };
     }
     return resultado;
@@ -53,9 +54,10 @@ class MonitorarGastosImpl {
       }
 
       resultado['Semana $semana'] = {
+        'inicio': inicio,
         'depositado': depositado,
         'levantado': levantado,
-        'final': depositado - levantado,
+        'final': (inicio + depositado - levantado),
       };
     }
     return resultado;

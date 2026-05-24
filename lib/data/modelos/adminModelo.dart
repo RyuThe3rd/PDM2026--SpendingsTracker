@@ -1,5 +1,5 @@
-import '../../dominio/entidades/admin.dart';
 import '../../listaDeImports.dart';
+
 
 class AdminModelo extends Admin {
   AdminModelo({

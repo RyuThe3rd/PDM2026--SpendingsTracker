@@ -1,8 +1,8 @@
-import '../../dominio/entidades/user.dart';
 import '../../listaDeImports.dart';
 
-class UserModelo extends User {
-  UserModelo({
+
+class UsuarioModelo extends Usuario {
+  UsuarioModelo({
     required super.id,
     required super.nome,
     required super.apelido,
@@ -21,8 +21,8 @@ class UserModelo extends User {
     };
   }
 
-  factory UserModelo.fromJson(Map<String, dynamic> json) {
-    return UserModelo(
+  factory UsuarioModelo.fromJson(Map<String, dynamic> json) {
+    return UsuarioModelo(
       id: json['id'],
       nome: json['nome'],
       apelido: json['apelido'],

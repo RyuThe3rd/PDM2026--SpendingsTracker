@@ -1,5 +1,6 @@
 import '../../listaDeImports.dart';
 
+
 class AuthCasosDeUso {
 
   InterfaceAutenticacao _autenticador;

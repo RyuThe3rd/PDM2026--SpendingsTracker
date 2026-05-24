@@ -1,4 +1,5 @@
-import '../../dominio/entidades/transacoes.dart';
+import '../../listaDeImports.dart';
+
 
 class TransacoesModelo extends Transacoes {
   TransacoesModelo({

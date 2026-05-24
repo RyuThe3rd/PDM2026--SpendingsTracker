@@ -1,7 +1,9 @@
+import 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/dominio/entidades/user.dart';
+
 import '../../dominio/entidades/user.dart';
 import '../../listaDeImports.dart';
 
-class UserModelo extends User {
+class UserModelo extends Usuario {
   UserModelo({
     required super.id,
     required super.nome,
