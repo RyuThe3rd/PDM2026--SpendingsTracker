@@ -1,7 +1,7 @@
 import '../../listaDeImports.dart';
 
 
-class User extends {
+class Usuario{
 
   int _id;
   String _nome;
@@ -17,7 +17,7 @@ class User extends {
    então todas funcionalidades serão só de user normal
   */
 
-  User({required id,
+  Usuario({required id,
     required String nome,
     required String apelido,
     required String nrDeTelefone,

@@ -1,6 +1,7 @@
 import '../../listaDeImports.dart';
 
-class Admin extends User{
+
+class Admin extends Usuario{
   Admin({required super.id,
     required super.nome,
     required super.apelido,

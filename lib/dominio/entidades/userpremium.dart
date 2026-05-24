@@ -1,6 +1,6 @@
 import '../../listaDeImports.dart';
 
-class UserPremium extends User{
+class UserPremium extends Usuario{
 
   UserPremium({required super.id,
     required super.nome,
