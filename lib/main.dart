@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -23,8 +24,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    //Rui: Aceder diretamente à lingua do OS através do PlatformDispatcher
+    final String sistemaIdioma = PlatformDispatcher.instance.locale.languageCode;
+
     return MaterialApp(
-      title: "${OS.language == 'pt' ?'Finança Local' : 'Spendings Tracker'}",
+      title: "${sistemaIdioma == 'pt' ?'Finança Local' : 'Spendings Tracker'}",
       theme: ThemeData(
         // This is the theme of your application.
         //

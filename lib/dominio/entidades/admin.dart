@@ -1,0 +1,14 @@
+import 'listaDeImports.dart';
+
+class Admin extends User{
+  Admin({required super.id,
+    required super.nome,
+    required super.apelido,
+    super.premium = null}){
+    //Rui: se for null então é admin
+
+    super.tipo = Tipo.Admin;
+
+  }
+
+}
