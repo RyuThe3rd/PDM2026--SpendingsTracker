@@ -9,7 +9,7 @@ class AdminModelo extends Admin {
     required super.nrDeTelefone,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'nome': nome,
@@ -19,7 +19,7 @@ class AdminModelo extends Admin {
     };
   }
 
-  factory AdminModelo.fromJson(Map<String, dynamic> json) {
+  factory AdminModelo.fromMap(Map<String, dynamic> json) {
     return AdminModelo(
       id: json['id'],
       nome: json['nome'],

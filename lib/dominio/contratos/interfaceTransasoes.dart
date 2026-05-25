@@ -1,5 +1,5 @@
+import '../../listaDeImports.dart';
 
-abstract interface class InterfaceTransacoes{
-
-
+abstract interface class InterfaceTransacoes {
+  List<Transacoes> obterTodas();
 }

@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../listaDeImports.dart';
 
-class OutrosProvider extends ChangeNotifier {
+class ProviderGlobal extends ChangeNotifier {
+  String _login = 'azul'; // 'azul' para Login, 'branco' para Cadastro
+
+  String get login => _login;
+
+  void setLogin(String value) {
+    _login = value;
+    notifyListeners();
+  }
+
   bool _isLoading = false;
   String? _erro;
 

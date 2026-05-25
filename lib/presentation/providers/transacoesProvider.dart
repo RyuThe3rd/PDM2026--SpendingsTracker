@@ -1,7 +1,13 @@
 import '../../../listaDeImports.dart';
 
 class TransacoesProvider extends ChangeNotifier {
-  List<Transacoes> _transacoes = [];
+  InterfaceTransacoes _transacoesRepo;
+
+  late List<Transacoes> _transacoes;
+
+  TransacoesProvider(this._transacoesRepo){
+    _transacoes = _transacoesRepo.obterTodas() ?? [];
+  }
 
   List<Transacoes> get transacoes => _transacoes;
 

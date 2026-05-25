@@ -9,7 +9,7 @@ class TransacoesModelo extends Transacoes {
     required super.data,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'tipo': tipo.name,
       'fonte': fonte.name,
@@ -18,7 +18,7 @@ class TransacoesModelo extends Transacoes {
     };
   }
 
-  factory TransacoesModelo.fromJson(Map<String, dynamic> json) {
+  factory TransacoesModelo.fromMap(Map<String, dynamic> json) {
     return TransacoesModelo(
       tipo: TipoTransacao.values.firstWhere((e) => e.name == json['tipo']),
       fonte: FonteTransacao.values.firstWhere((e) => e.name == json['fonte']),

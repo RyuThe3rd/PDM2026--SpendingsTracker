@@ -10,7 +10,7 @@ class UsuarioModelo extends Usuario {
     super.premium = false,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'nome': nome,
@@ -21,7 +21,7 @@ class UsuarioModelo extends Usuario {
     };
   }
 
-  factory UsuarioModelo.fromJson(Map<String, dynamic> json) {
+  factory UsuarioModelo.fromMap(Map<String, dynamic> json) {
     return UsuarioModelo(
       id: json['id'],
       nome: json['nome'],

@@ -1,9 +1,10 @@
 
+import '../../listaDeImports.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../servicos/coletarTransacoes.dart';
 
-class TransacoesRepo {
+class TransacoesRepo implements InterfaceTransacoes {
   FirebaseFirestore? _firestore;
   final ColetarTransacoes _coletorSMS = ColetarTransacoes();
   final List<Map<String, dynamic>> _transacoesCache = [];
@@ -38,6 +39,8 @@ class TransacoesRepo {
     _firestore?.collection('Transações').add(transacao);
   }
 
-  List<Map<String, dynamic>> obterTodas() => _transacoesCache;
-
+  List<Transacoes> obterTodas() {
+    // Convertemos cada Map da cache para um objeto do tipo Transacoes
+    return _transacoesCache.map((map) => TransacoesModelo.fromMap(map)).toList();
+  }
 }
