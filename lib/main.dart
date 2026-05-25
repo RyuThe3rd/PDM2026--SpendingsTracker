@@ -17,7 +17,8 @@ void main() async {
 
   //chamar o serviço de coletar mensagens
   final transacoesRepo = TransacoesRepo();
-  transacoesRepo.sincronizarSms();
+  //transacoesRepo.sincronizarSms();
+  // fazer no initState da Tela home
   final usuarioRepo = UserRepo();
 
   runApp(

@@ -9,6 +9,8 @@ class TransacoesProvider extends ChangeNotifier {
     _transacoes = _transacoesRepo.obterTodas() ?? [];
   }
 
+  InterfaceTransacoes get transacoesRepo => _transacoesRepo;
+
   List<Transacoes> get transacoes => _transacoes;
 
   void adicionarTransacao(Transacoes transacao) {

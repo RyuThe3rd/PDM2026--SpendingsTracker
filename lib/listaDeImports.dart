@@ -44,3 +44,4 @@ export 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/presentation/
 
 //3.2- Providers
 export "package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/presentation/providers/outrosProvider.dart";
+export "package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/presentation/providers/transacoesProvider.dart";
