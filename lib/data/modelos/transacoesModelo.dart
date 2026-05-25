@@ -15,6 +15,8 @@ class TransacoesModelo extends Transacoes {
       'fonte': fonte.name,
       'valor': valor,
       'data': data.toIso8601String(),
+      'mes': data.month,
+      "ano": data.year,
     };
   }
 

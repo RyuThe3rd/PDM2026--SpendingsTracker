@@ -1,11 +1,8 @@
-
 import '../../listaDeImports.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../servicos/coletarTransacoes.dart';
 
 class TransacoesRepo implements InterfaceTransacoes {
-  FirebaseFirestore? _firestore;
+  FirebaseFirestore _firestore;
   final ColetarTransacoes _coletorSMS = ColetarTransacoes();
   final List<Map<String, dynamic>> _transacoesCache = [];
 
@@ -15,7 +12,6 @@ class TransacoesRepo implements InterfaceTransacoes {
   }):
   _firestore = firestore
       ?? FirebaseFirestore.instance;
-
 
   Future<void> sincronizarSms() async {
   final novasTransacoes = await _coletorSMS.coletar();
@@ -34,10 +30,22 @@ class TransacoesRepo implements InterfaceTransacoes {
     }
   }
 
-  void adicionarTransacao(Map<String, dynamic> transacao) {
+  void adicionarTransacao(Map<String, dynamic> transacao) async {
     _transacoesCache.add(transacao);
-    _firestore?.collection('Transações').add(transacao);
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    try {
+      await _firestore
+          .collection('Users')
+          .doc(uid)
+          .collection('Transações')
+          .add(transacao);
+    } catch (e) {
+      print("Erro ao gravar no Firestore: $e");
+    }
   }
+
 
   List<Transacoes> obterTodas() {
     // Convertemos cada Map da cache para um objeto do tipo Transacoes

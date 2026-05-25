@@ -14,11 +14,20 @@ class AuthCasosDeUso {
   Future<void> logout() async => await _autenticador.logout();
 
   Future<bool> registar(Map<String, dynamic> dadosDeRegisto) async {
-    return await _autenticador.registar(dadosDeRegisto);
+
+    final resposta = await _autenticador.registar(dadosDeRegisto);
+
+    if( resposta != null && resposta is Usuario) return true;
+
+    return false;
   }
 
   Future<bool> editarPerfil(Map<String, dynamic> dadosDePerfil) async {
-    return await _autenticador.editarPerfil(dadosDePerfil);
+    final resposta = await _autenticador.editarPerfil(dadosDePerfil);
+
+    if( resposta != null && resposta is Usuario) return true;
+
+    return false;
   }
 
   Future<bool> eliminarContaEDados() async {

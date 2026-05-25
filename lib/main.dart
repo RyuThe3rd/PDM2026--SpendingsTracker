@@ -20,6 +20,7 @@ void main() async {
   //transacoesRepo.sincronizarSms();
   // fazer no initState da Tela home
   final usuarioRepo = UserRepo();
+  final estatisticasRepo = EstatisticasRepo();
 
   runApp(
     MultiProvider(
@@ -28,6 +29,7 @@ void main() async {
         Provider.value(value: transacoesRepo),
         ChangeNotifierProvider(create: (_) => TransacoesProvider(transacoesRepo)),
         ChangeNotifierProvider(create: (_) => UserProvider(usuarioRepo)),
+        ChangeNotifierProvider(create: (_) => EstatisticaProvider(estatisticasRepo)),
       ],
       child: const MyApp(),
     ),

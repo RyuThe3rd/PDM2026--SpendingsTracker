@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/modelos/usuarioModelos.dart';
 import '../../dominio/contratos/interfaceAutenticacao.dart';
+import '../../listaDeImports.dart';
 
 class UserRepo implements InterfaceAutenticacao {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -32,7 +34,7 @@ class UserRepo implements InterfaceAutenticacao {
   Future<void> logout() async => await _firebaseAuth.signOut();
 
   @override
-  Future<bool> registar(Map<String, dynamic> dadosDeRegisto) async {
+  Future<Usuario?> registar(Map<String, dynamic> dadosDeRegisto) async {
     try {
       //Rui: cria e faz login automaticamente
       await _firebaseAuth.createUserWithEmailAndPassword(
@@ -50,14 +52,14 @@ class UserRepo implements InterfaceAutenticacao {
           .doc(currentUser!.uid)
           .set(dadosDeRegisto);
 
-      return true;
+      return UsuarioModelo.fromMap(dadosDeRegisto);
     } catch (e) {
-      return false;
+      return null;
     }
   }
 
   @override
-  Future<bool> editarPerfil(Map<String, dynamic> dadosDePerfil) async {
+  Future<Usuario> editarPerfil(Map<String, dynamic> dadosDePerfil) async {
     // Lógica para atualizar firestore e depois Firebase Auth
     await _firestore.collection('Users')
         .doc(currentUser!.uid)
@@ -65,12 +67,45 @@ class UserRepo implements InterfaceAutenticacao {
 
     //atualiza password mesmo se não tiver realmente mudado
     await _firebaseAuth.currentUser!.updatePassword(dadosDePerfil['senha']);
-    return true;
+
+    return UsuarioModelo.fromMap(dadosDePerfil);
   }
 
   @override
   Future<bool> eliminarContaEDados() {
     // TODO: implement eliminarContaEDados
     throw UnimplementedError();
+  }
+
+  @override
+  Future<void> eliminarUsuario(String uid) async {
+    try {
+      /*
+      Rui: Sobre o Firebase Auth:
+      O Firebase não permite que um usuário logado apague o Auth de outro usuário.
+      O que fazemos aqui é remover os dados dele.
+      */
+
+      await _firestore.collection('Users').doc(uid).delete();
+      //No Firestore, apagar um documento pai não apaga as sub-coleções automaticamente.
+      await _eliminarDadosRelacionados(uid);
+
+      print("Utilizador $uid e os seus dados foram eliminados com sucesso.");
+    } catch (e) {
+      print("Erro ao eliminar utilizador: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> _eliminarDadosRelacionados(String uid) async {
+    var transacoes = await _firestore.collection('Users').doc(uid).collection('Transações').get();
+    for (var doc in transacoes.docs) {
+      await doc.reference.delete();
+    }
+
+    var estatisticas = await _firestore.collection('Users').doc(uid).collection('Estatisticas').get();
+    for (var doc in estatisticas.docs) {
+      await doc.reference.delete();
+    }
   }
 }
