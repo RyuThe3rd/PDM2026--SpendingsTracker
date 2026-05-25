@@ -1,43 +1,58 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../servicos/coletarTransacoes.dart';
+import '../servicos/insightsTransacoesService.dart';
 
 class TransacoesRepo {
   FirebaseFirestore? _firestore;
-  final ColetarTransacoes _coletorSMS = ColetarTransacoes();
 
-  //Rui: vai receber dependência do TransacoesProvider
+  final ColetarTransacoes _coletorSMS = ColetarTransacoes();
+  final InsightsTransacoesService _insightsService = InsightsTransacoesService();
+
+  final List<Map<String, dynamic>> _transacoesCache = [];
+
   TransacoesRepo({
     FirebaseFirestore? firestore,
-  }):
-  _firestore = firestore
-      ?? FirebaseFirestore.instance;
-
+  }) : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<void> sincronizarSms() async {
-  final novasTransacoes = await _coletorSMS.coletar();
-
+    final novasTransacoes = await _coletorSMS.coletar();
 
     for (var transacao in novasTransacoes) {
-      /*Verificar se já não existe no cache
-      (pelo id_sms) para evitar duplicados
-       */
-      bool jaExiste =
-      _transacoesCache.any((t) => t['id_sms'] == transacao['id_sms']);
+      bool jaExiste = _transacoesCache.any(
+            (t) => t['id_sms'] == transacao['id_sms'],
+      );
 
       if (!jaExiste) {
-      adicionarTransacao(transacao);
+        await adicionarTransacao(transacao);
       }
     }
   }
-  final List<Map<String, dynamic>> _transacoesCache = [];
 
-  void adicionarTransacao(Map<String, dynamic> transacao) {
+  Future<void> adicionarTransacao(Map<String, dynamic> transacao) async {
     _transacoesCache.add(transacao);
-    _firestore?.collection('Transações').add(transacao);
+
+    await _firestore?.collection('Transações').add({
+      ...transacao,
+      'criado_em': FieldValue.serverTimestamp(),
+    });
   }
 
-  List<Map<String, dynamic>> obterTodas() => _transacoesCache;
+  List<Map<String, dynamic>> obterTodas() {
+    return _transacoesCache;
+  }
 
+  Future<String> gerarInsightSemanal() async {
+    return await _insightsService.gerarInsight(
+      transacoes: _transacoesCache,
+      periodo: PeriodoInsight.semanal,
+    );
+  }
+
+  Future<String> gerarInsightMensal() async {
+    return await _insightsService.gerarInsight(
+      transacoes: _transacoesCache,
+      periodo: PeriodoInsight.mensal,
+    );
+  }
 }
