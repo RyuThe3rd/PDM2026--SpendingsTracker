@@ -222,13 +222,14 @@ class _TelaHomeState extends State<TelaHome> {
       return const SizedBox.shrink();
     }
 
-    // Definimos uma prioridade para escolher qual insight mostrar na Home
-    // Ex: Alertas são mais importantes que Dicas.
+    // Definimos uma prioridade para escolher qual categoria mostrar na Home
     final prioridade = [
       TipoDeInsight.Alerta,
-      TipoDeInsight.Comportamento,
-      TipoDeInsight.Dica,
-      TipoDeInsight.Resumo,
+      TipoDeInsight.Orcamento,
+      TipoDeInsight.Investimento,
+      TipoDeInsight.Gastos,
+      TipoDeInsight.Eficiencia,
+      TipoDeInsight.Fluxo,
     ];
 
     TipoDeInsight? tipoSelecionado;
@@ -239,31 +240,56 @@ class _TelaHomeState extends State<TelaHome> {
       }
     }
 
-    // Caso não encontre nenhum da lista de prioridade, pega o primeiro disponível
-    tipoSelecionado ??= insight.dadosDeInsight!.keys.first;
-    final textoDoInsight = insight.dadosDeInsight![tipoSelecionado]!;
+    //Rui: se não houver nenhum da prioridade, pega o Alerta
+    tipoSelecionado = tipoSelecionado?? TipoDeInsight.Alerta;
+    final textoExibido = insight.dadosDeInsight?[tipoSelecionado]
+        ?? "Não há transações suficientes";
 
-    // Definir ícone baseado no tipo selecionado
-    IconData icon = Icons.lightbulb;
+    IconData icon = Icons.lightbulb_outline;
+    String tituloCard = "";
+
     switch (tipoSelecionado) {
       case TipoDeInsight.Alerta:
         icon = Icons.warning_amber_rounded;
+        tituloCard = "Alerta de Gastos";
         break;
-      case TipoDeInsight.Comportamento:
+      case TipoDeInsight.Orcamento:
+        icon = Icons.pie_chart;
+        tituloCard = "Gestão de Orçamento";
+        break;
+      case TipoDeInsight.Investimento:
         icon = Icons.trending_up;
+        tituloCard = "Sugestão de Investimento";
         break;
-      case TipoDeInsight.Dica:
-        icon = Icons.lightbulb_outline;
+      case TipoDeInsight.Gastos:
+        icon = Icons.shopping_bag_outlined;
+        tituloCard = "Padrões de Consumo";
         break;
-      case TipoDeInsight.Resumo:
-        icon = Icons.summarize_outlined;
+      case TipoDeInsight.Eficiencia:
+        icon = Icons.speed;
+        tituloCard = "Eficiência Financeira";
+        break;
+      case TipoDeInsight.Fluxo:
+        icon = Icons.swap_horiz;
+        tituloCard = "Comparação de Fluxo";
         break;
     }
 
     return GestureDetector(
       onTap: () {
-        // SE o User for premium ele vai para a tela Insights
-        // Navigator.pushNamed(context, '/Insights');
+        // Verificar se o usuário tem permissão para ver todos os insights
+        final user = context.read<UserProvider>().usuario;
+
+        if (user != null && user.temAcessoPremium) {
+          Navigator.pushNamed(context, '/Insights');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Esta funcionalidade é exclusiva para membros Premium."),
+              backgroundColor: Color.fromARGB(255, 23, 24, 106),
+            ),
+          );
+        }
       },
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -277,7 +303,7 @@ class _TelaHomeState extends State<TelaHome> {
             Icon(icon, color: const Color.fromARGB(255, 23, 24, 106)),
             const SizedBox(height: 10),
             Text(
-              tipoSelecionado.name, // Exibe o nome do tipo (Alerta, Dica, etc)
+              tituloCard, // Exibe o nome do tipo (Alerta, Dica, etc)
               style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -286,7 +312,7 @@ class _TelaHomeState extends State<TelaHome> {
             ),
             const SizedBox(height: 5),
             Text(
-              textoDoInsight,
+              textoExibido,
               style: const TextStyle(color: Colors.black54, fontSize: 13),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -295,7 +321,7 @@ class _TelaHomeState extends State<TelaHome> {
             const Row(
               children: [
                 Text(
-                  "VER INSIGHTS →",
+                  "VER MAIS INSIGHTS",
                   style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,

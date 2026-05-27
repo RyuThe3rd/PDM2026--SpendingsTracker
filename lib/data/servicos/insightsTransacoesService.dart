@@ -5,7 +5,26 @@ class InsightsTransacoesService {
   static const String _url =
       'https://deepseek-api-2026-439822594322.africa-south1.run.app/ai';
 
+  //todo: IMPORTANTE
+  Future<Insights?> insightsDeFluxo(String? promptDeSistema,
+      List<Map<String, dynamic>> transacoes){
+
+    final promptSistema = "escrevam algo aqui, por favor usem a template de tags xml do metodo abaixo deste";
+    //Olhem para a tela de Insights no documento word
+    // alguns dos cards precisam de estatistica de outros meses ou semanas
+
+    //TODO: ESTE METODO DEVE:
+    // 1- PEGAR ESTATISTICAS DA SEMANA/MES CORRENTE
+    // 2- COMPARAR COM ESTATISTICAS DA SEMANA/MES ANTERIOR
+    // 3 - CONVERTER PARA STRING
+    // 4 - GERAR UMA PROMPT DE SISTEMA DIFERENTE DA GENERALIZADA
+    // 5 - PASSAR ESSA PROMPT PARA O METODO gerarInsight ABAIXO
+
+    return gerarInsight(promptDeSistema: promptSistema,transacoes: transacoes, periodo: periodo)
+  }
+
   Future<Insights?> gerarInsight({
+    String? promptDeSistema,
     required List<Map<String, dynamic>> transacoes,
     required PeriodoEstatistica periodo,
   }) async {
@@ -27,23 +46,18 @@ class InsightsTransacoesService {
 
     final resumo = _montarResumo(transacoesDoPeriodo);
 
-    final promptSistema = '''
+    final promptSistema = promptDeSistema ?? '''
     Você é um assistente financeiro inteligente de uma aplicação mobile chamada SpendingsTracker.
     A aplicação ajuda o utilizador a entender os seus gastos, melhorar a literacia financeira e receber alertas úteis.
     Responda de forma curta, clara, humana e direta.
     A resposta deve ser apropriada para aparecer num card de insight financeiro.
     
-    Estrutura esperada:
-    Resumo: ...
-    Comportamento: ...
-    Alerta: ...
-    Dica: ...
-    
     Responda no formato de etiquetas xml:
-    <Resumo>conteúdo</Resumo>
-    <Comportamento>conteúdo</Comportamento>
-    <Alerta>conteúdo</Alerta>
-    <Dica>conteúdo</Dica>
+    <Investimento>Dica de Sugestão de Investimento"</Investimento>
+    <Orcamento>Dica de Gestão de Orçamento</Orcamento>
+    <Eficiencia>Observação de Eficiência de Gastos"</Eficiencia>
+    <Fluxo>Comparação de Fluxo</Fluxo>
+    <Padroes>Padrões de Gastos</Padroes>
     
     Não invente valores. Use apenas os dados enviados.
     ''';
