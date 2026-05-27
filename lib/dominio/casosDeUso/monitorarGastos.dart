@@ -1,6 +1,7 @@
 import '../../listaDeImports.dart';
 
-class MonitorarGastos {final InterfaceTransacoes _transacoesRepo;
+class MonitorarGastos {
+  final InterfaceTransacoes _transacoesRepo;
 
   MonitorarGastos(this._transacoesRepo);
 

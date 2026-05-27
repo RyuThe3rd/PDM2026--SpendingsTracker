@@ -25,6 +25,10 @@ export 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/dominio/contr
 export 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/dominio/contratos/interfaceTransasoes.dart';
 export 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/dominio/contratos/interfaceEstatisticas.dart';
 
+//1.3 casos de uso
+export 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/dominio/casosDeUso/monitorarGastos.dart';
+export 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/dominio/casosDeUso/authCasosDeUso.dart';
+
 //2- Camada de Dados
 //2.1 - Servicos
 export "package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/servicos/insightsTransacoesService.dart";

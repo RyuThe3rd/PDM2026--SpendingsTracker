@@ -5,26 +5,10 @@ class InsightsTransacoesService {
   static const String _url =
       'https://deepseek-api-2026-439822594322.africa-south1.run.app/ai';
 
-  //todo: IMPORTANTE
-  Future<Insights?> insightsDeFluxo(String? promptDeSistema,
-      List<Map<String, dynamic>> transacoes){
-
-    final promptSistema = "escrevam algo aqui, por favor usem a template de tags xml do metodo abaixo deste";
-    //Olhem para a tela de Insights no documento word
-    // alguns dos cards precisam de estatistica de outros meses ou semanas
-
-    //TODO: ESTE METODO DEVE:
-    // 1- PEGAR ESTATISTICAS DA SEMANA/MES CORRENTE
-    // 2- COMPARAR COM ESTATISTICAS DA SEMANA/MES ANTERIOR
-    // 3 - CONVERTER PARA STRING
-    // 4 - GERAR UMA PROMPT DE SISTEMA DIFERENTE DA GENERALIZADA
-    // 5 - PASSAR ESSA PROMPT PARA O METODO gerarInsight ABAIXO
-
-    return gerarInsight(promptDeSistema: promptSistema,transacoes: transacoes, periodo: periodo)
-  }
 
   // Método especializado para gerar insights de comparação de fluxo
   Future<Insights?> insightsDeFluxo({
+    required String idEstatisticaAnterior,
     required List<Map<String, dynamic>> transacoes,
     required PeriodoEstatistica periodo,
   }) async {
@@ -38,16 +22,15 @@ class InsightsTransacoesService {
         .doc(uid)
         .collection('Estatisticas');
 
-    final queryAnterior = await collection
-        .where('periodo', isEqualTo: periodo.name)
-        .orderBy('mes', descending: true) // Ordenação simplificada por mês
-        .limit(1)
-        .get();
+    final queryAnterior = await collection.
+        doc(idEstatisticaAnterior)
+        .get(); //retorna DocumentSnapshot e não os dados diretamente
 
     String dadosAnterioresStr = "Histórico: Primeiro período de análise, sem dados anteriores.";
 
-    if (queryAnterior.docs.isNotEmpty) {
-      final anterior = queryAnterior.docs.first.data();
+    //comparação meio binária né, os data points são só a semana/mes atual e o anterior
+    if (queryAnterior.exists) {
+      final anterior = queryAnterior.data() as Map<String, dynamic>;
       // 3 - CONVERTER PARA STRING (Preparar contexto para a IA)
       dadosAnterioresStr = '''
       Resumo do Período Anterior:

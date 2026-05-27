@@ -20,7 +20,7 @@ class _TelaHomeState extends State<TelaHome> {
       //tProvider.atualizarTransacoes();
 
       // Gera os relatórios e insights baseados nas novas transações
-      await eProvider.carregarEstatisticas();
+      await eProvider.inicializarEstatisticas();
     });
   }
 

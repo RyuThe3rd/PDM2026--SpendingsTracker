@@ -12,8 +12,6 @@ class EstatisticaSemanalModelo extends EstatisticaSemanal {
     super.dadosDiarios,
     required super.criadoEm,
     required super.weekId,
-    required super.dataInicio,
-    required super.dataFim,
   });
 
   Map<String, dynamic> toMap() {
@@ -35,7 +33,7 @@ class EstatisticaSemanalModelo extends EstatisticaSemanal {
   }
 
   factory EstatisticaSemanalModelo.fromMap(Map<String, dynamic> map) {
-    return EstatisticaSemanalModelo(
+    final a =  EstatisticaSemanalModelo(
       mes: map['mes'],
       valorGanho: (map['valorGanho'] as num).toDouble(),
       valorGasto: (map['valorGasto'] as num).toDouble(),
@@ -45,9 +43,12 @@ class EstatisticaSemanalModelo extends EstatisticaSemanal {
       semanaAnteriorId: map['semanaAnteriorId'],
       criadoEm: (map['criadoEm'] as Timestamp).toDate(),
       weekId: map['weekId'],
-      dataInicio: (map['dataInicio'] as Timestamp).toDate(),
-      dataFim: (map['dataFim'] as Timestamp).toDate(),
       dadosDiarios: map['dadosDiarios'] != null ? Map<String, dynamic>.from(map['dadosDiarios']) : null,
     );
+
+    a.dataInicio = (map['dataInicio'] as Timestamp).toDate();
+    a.dataFim = (map['dataFim'] as Timestamp).toDate();
+
+    return a;
   }
 }

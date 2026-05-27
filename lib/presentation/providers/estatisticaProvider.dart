@@ -2,18 +2,18 @@ import '../../listaDeImports.dart';
 
 class EstatisticaProvider extends ChangeNotifier {
   final InterfaceEstatisticas _estatisticasRepo;
-  
+  final InterfaceTransacoes _transacoesRepo;
+
   EstatisticaSemanalModelo? _semanaAtual;
   EstatisticaMensalModelo? _mesAtual;
   bool _isLoading = false;
 
-  EstatisticaProvider(this._estatisticasRepo);
+  EstatisticaProvider(this._estatisticasRepo, this._transacoesRepo);
 
   EstatisticaSemanalModelo? get semanaAtual => _semanaAtual;
   EstatisticaMensalModelo? get mesAtual => _mesAtual;
   bool get isLoading => _isLoading;
 
-  /// Método principal chamado na inicialização da TelaHome
   Future<void> inicializarEstatisticas() async {
     _isLoading = true;
     notifyListeners();
@@ -21,7 +21,7 @@ class EstatisticaProvider extends ChangeNotifier {
     try {
       final agora = DateTime.now();
       
-      // 1. GESTÃO SEMANAL
+      //Gestão da Estatistica Semanal corrente
       _semanaAtual = await _estatisticasRepo.obterSemanaMaisRecente();
       final weekIdAgora = (_estatisticasRepo as EstatisticasRepo).getWeekId(agora);
 
@@ -30,8 +30,8 @@ class EstatisticaProvider extends ChangeNotifier {
         final monday = agora.subtract(Duration(days: agora.weekday - 1));
         _semanaAtual = await _estatisticasRepo.criarEstatisticaSemanalVazia(monday);
       } else if (_semanaAtual!.weekId != weekIdAgora) {
-        // Mudou de semana! Preencher gaps se existirem
-        await (_estatisticasRepo as EstatisticasRepo).preencherGapsDeSemanas(
+        // Se mudou de semana: Preencher gaps se existirem
+        await (_estatisticasRepo).preencherGapsDeSemanas(
           _semanaAtual!.dataInicio, 
           agora
         );
@@ -43,9 +43,9 @@ class EstatisticaProvider extends ChangeNotifier {
         );
       }
 
-      // 2. GESTÃO MENSAL
+      //gestão da Estatistica Mensal corrente
       _mesAtual = await _estatisticasRepo.obterMesMaisRecente();
-      final monthIdAgora = (_estatisticasRepo as EstatisticasRepo).getMonthId(agora);
+      final monthIdAgora = (_estatisticasRepo).getMonthId(agora);
 
       if (_mesAtual == null) {
         _mesAtual = await _estatisticasRepo.criarEstatisticaMensalVazia(agora);
@@ -56,7 +56,7 @@ class EstatisticaProvider extends ChangeNotifier {
         );
       }
 
-      // 3. ATUALIZAR INSIGHTS SE NECESSÁRIO
+      await recarregarValoresDasEstatisticas();
       await carregarInsights();
 
     } catch (e) {
@@ -76,12 +76,47 @@ class EstatisticaProvider extends ChangeNotifier {
     }
   }
 
-  /// Chamado quando novas transações são sincronizadas para atualizar os valores
-  void atualizarValoresComTransacoes(List<Transacoes> transacoes) {
+  Future<void> recarregarValoresDasEstatisticas() async {
     if (_semanaAtual == null) return;
 
-    final monitorar = MonitorarGastos(_semanaAtual!.semanaAnteriorId as dynamic); // Apenas para reuso da lógica de cálculo
-    // Nota: Aqui idealmente teríamos uma lógica no Repo para recalcular e persistir
-    // Por agora, o inicializarEstatisticas trata da consistência estrutural.
+    final monitorar = MonitorarGastos(_transacoesRepo);
+
+    //Atualizar dados da semana (Gráfico de barras e saldo semanal)
+    final dadosSemanais = monitorar.gastoSemanal();
+    double ganhoS = 0; // ganhoSemanal
+    double gastoS = 0;
+
+    dadosSemanais.forEach((dia, valores) {
+      ganhoS += (valores['depositado'] as num).toDouble();
+      gastoS += (valores['levantado'] as num).toDouble();
+    });
+
+    _semanaAtual!.valorGanho = ganhoS;
+    _semanaAtual!.valorGasto = gastoS;
+    _semanaAtual!.dadosDiarios = dadosSemanais;
+
+    // Calcular a diferença comparativa se houver semana anterior
+    if (_semanaAtual!.semanaAnteriorId != null) {
+      final anterior = await (_estatisticasRepo as EstatisticasRepo).buscarSemanaPorId(_semanaAtual!.semanaAnteriorId!);
+      if (anterior != null) {
+        _semanaAtual!.diferencaComparativa = ((ganhoS - gastoS) - (anterior.valorGanho - anterior.valorGasto));
+      }
+    }
+
+    //Atualizar dados do mês (Agregado das semanas)
+    if (_mesAtual != null) {
+      final dadosMensais = monitorar.gastoMensal();
+      double ganhoM = 0; //ganhoMensal
+      double gastoM = 0;
+      dadosMensais.forEach((sem, val) {
+        ganhoM += (val['depositado'] as num).toDouble();
+        gastoM += (val['levantado'] as num).toDouble();
+      });
+      _mesAtual!.valorGanho = ganhoM;
+      _mesAtual!.valorGasto = gastoM;
+      _mesAtual!.dadosSemanais = dadosMensais;
+    }
+
+    notifyListeners();
   }
 }

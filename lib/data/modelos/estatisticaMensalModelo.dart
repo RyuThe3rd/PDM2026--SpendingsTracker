@@ -22,12 +22,12 @@ class EstatisticaMensalModelo extends EstatisticaMensal {
       'valorGanho': valorGanho,
       'valorGasto': valorGasto,
       'diferencaComparativa': diferencaComparativa,
-      'insight': (insights as InsightsModelo).toMap(),
+      'insights': (insights as InsightsModelo).toMap(),
       'semanasDoMesIds': semanasDoMesIds,
       'mesAnteriorId': mesAnteriorId,
       'dadosSemanais': dadosSemanais,
       'periodo': periodo.name,
-      'criadoEm': criadoEm,
+      'criadoEm': Timestamp.fromDate(criadoEm),
       'monthId': monthId,
     };
   }
@@ -39,10 +39,10 @@ class EstatisticaMensalModelo extends EstatisticaMensal {
       valorGanho: (map['valorGanho'] as num).toDouble(),
       valorGasto: (map['valorGasto'] as num).toDouble(),
       diferencaComparativa: (map['diferencaComparativa'] as num).toDouble(),
-      insights: InsightsModelo.fromMap(map['insight']),
-      semanasDoMesIds: List<Map<int,dynamic>>.from(map['semanasDoMesIds']),
+      insights: InsightsModelo.fromMap(map['insights']),
+      semanasDoMesIds: List<Map<int, dynamic>>.from(map['semanasDoMesIds']),
       mesAnteriorId: map['mesAnteriorId'],
-      dadosSemanais: map['dadosSemanais'],
+      dadosSemanais: Map<String, dynamic>.from(map['dadosSemanais']),
       criadoEm: (map['criadoEm'] as Timestamp).toDate(),
       monthId: map['monthId'],
     );

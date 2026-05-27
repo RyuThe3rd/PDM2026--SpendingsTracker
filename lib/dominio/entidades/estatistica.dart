@@ -75,8 +75,8 @@ class EstatisticaMensal extends Estatistica {
   String monthId; // "2026-05"
   final int ano;
   String? mesAnteriorId;
-  final List<Map<int, dynamic>> semanasDoMesIds; // map[1] = idDaSemana1
-  final Map<String, dynamic> dadosSemanais;
+  List<Map<int, dynamic>> semanasDoMesIds; // map[1] = idDaSemana1
+  Map<String, dynamic> dadosSemanais;
   /// Dados detalhados de cada semana (Semana 1, Semana 2, etc.)
   /// { 'Semana 1': { 'inicial': 0, 'levantado': 0, 'depositado': 0, 'final': 0 }, ... }
 

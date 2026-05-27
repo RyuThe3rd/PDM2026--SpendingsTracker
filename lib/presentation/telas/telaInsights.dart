@@ -27,14 +27,20 @@ class _TelaInsightsState extends State<TelaInsights> {
           }
 
           if (estatistica == null) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  "Ainda não temos dados suficientes para gerar a sua análise de IA. Continue usando o app!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey, fontSize: 16),
-                ),
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  _construirTogglePeriodo(),
+                  const SizedBox(height: 100),
+                  const Center(
+                    child: Text(
+                      "Ainda não temos dados suficientes para gerar a sua análise deste período. Continue usando o app!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                    ),
+                  ),
+                ],
               ),
             );
           }
@@ -46,6 +52,8 @@ class _TelaInsightsState extends State<TelaInsights> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _construirTogglePeriodo(),
+                const SizedBox(height: 30),
                 const Text(
                   "ANÁLISE DE IA",
                   style: TextStyle(
@@ -80,7 +88,7 @@ class _TelaInsightsState extends State<TelaInsights> {
                 _construirCardDeEficiencia(estatistica.diferencaComparativa, periodoSelecionado),
                 const SizedBox(height: 20),
 
-                _construirCardDeComparacaoDeFluxo(),
+               _construirCardDeComparacaoDeFluxo(estatistica),
                 const SizedBox(height: 20),
 
                 _construirCardDePadroesDeGastos(estatistica),
@@ -89,6 +97,52 @@ class _TelaInsightsState extends State<TelaInsights> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _construirTogglePeriodo() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 238, 235, 241),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          _construirBotaoAba("SEMANAL", PeriodoEstatistica.semanal),
+          _construirBotaoAba("MENSAL", PeriodoEstatistica.mensal),
+        ],
+      ),
+    );
+  }
+
+  Widget _construirBotaoAba(String texto, PeriodoEstatistica periodo) {
+    bool ativo = periodoSelecionado == periodo;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            periodoSelecionado = periodo;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: ativo ? const Color.fromARGB(255, 23, 24, 106) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              texto,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: ativo ? Colors.white : Colors.grey[600],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -289,22 +343,15 @@ class _TelaInsightsState extends State<TelaInsights> {
     );
   }
 
-  Widget _construirCardDeComparacaoDeFluxo() {
+  Widget _construirCardDeComparacaoDeFluxo(Estatistica estatistica) {
+    final max = (estatistica.valorGanho > estatistica.valorGasto ? estatistica.valorGanho : estatistica.valorGasto).clamp(1.0, double.infinity);
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 241, 242, 248),
-        borderRadius: BorderRadius.circular(25),
-      ),
+      decoration: BoxDecoration(color: const Color.fromARGB(255, 241, 242, 248), borderRadius: BorderRadius.circular(25)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text("Comparação de Fluxo", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color.fromARGB(255, 23, 24, 106))),
-          const SizedBox(height: 8),
-          const Text(
-            "O teu rácio de poupança está acima da média de usuários similares em Maputo.",
-            style: TextStyle(fontSize: 13, color: Colors.black54, height: 1.4),
-          ),
           const SizedBox(height: 25),
           SizedBox(
             height: 120,
@@ -312,15 +359,24 @@ class _TelaInsightsState extends State<TelaInsights> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _construirBarraSimples(50, Colors.grey.shade300),
-                _construirBarraSimples(90, const Color.fromARGB(255, 23, 24, 106)),
-                _construirBarraSimples(40, Colors.grey.shade300),
-                _construirBarraSimples(75, const Color.fromARGB(255, 23, 24, 106)),
+                _colunaComLabel("ENTRADAS", (estatistica.valorGanho / max) * 100, const Color.fromARGB(255, 23, 24, 106)),
+                _colunaComLabel("SAÍDAS", (estatistica.valorGasto / max) * 100, Colors.grey.shade400),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _colunaComLabel(String label, double height, Color color) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(width: 35, height: height, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8))),
+        const SizedBox(height: 12),
+        Text(label, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey)),
+      ],
     );
   }
 

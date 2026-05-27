@@ -53,12 +53,13 @@ class EstatisticasRepo implements InterfaceEstatisticas {
       insights: Insights(data: agora, dadosDeInsight: {}),
       criadoEm: agora,
       weekId: getWeekId(inicio),
-      dataInicio: inicio,
-      dataFim: dataFim,
       semanaAnteriorId: anteriorId,
       semanaCounter: ((inicio.day - 1) / 7).floor() + 1,
       dadosDiarios: {},
     );
+
+    estatistica.dataInicio = inicio;
+    estatistica.dataFim = dataFim;
 
     if (uid != null) {
       await _firestore
@@ -153,12 +154,21 @@ class EstatisticasRepo implements InterfaceEstatisticas {
       return Insights(data: DateTime.now(), dadosDeInsight: {TipoDeInsight.Alerta: "Sem transações nesta semana."});
     }
 
-    final insights = await _insightsService.gerarInsight(
-      transacoes: transacoes,
-      periodo: PeriodoEstatistica.semanal,
-    );
+    Insights? resultado;
+    if (estatistica.semanaAnteriorId != null) {
 
-    return insights ?? estatistica.insights;
+      resultado = await _insightsService.insightsDeFluxo(
+        idEstatisticaAnterior: estatistica.semanaAnteriorId!,
+        transacoes: transacoes,
+        periodo: PeriodoEstatistica.semanal,
+      );
+    } else {
+      resultado = await _insightsService.gerarInsight(
+        transacoes: transacoes,
+        periodo: PeriodoEstatistica.semanal,
+      );
+    }
+    return resultado ?? estatistica.insights;
   }
 
   @override
@@ -178,11 +188,50 @@ class EstatisticasRepo implements InterfaceEstatisticas {
       return Insights(data: DateTime.now(), dadosDeInsight: {TipoDeInsight.Alerta: "Sem transações neste mês."});
     }
 
-    final insights = await _insightsService.gerarInsight(
-      transacoes: transacoes,
-      periodo: PeriodoEstatistica.mensal,
-    );
+    Insights? resultado;
+    if (estatistica.mesAnteriorId != null) {
 
-    return insights ?? estatistica.insights;
+      resultado = await _insightsService.insightsDeFluxo(
+        idEstatisticaAnterior: estatistica.mesAnteriorId!,
+        transacoes: transacoes,
+        periodo: PeriodoEstatistica.mensal,
+      );
+    } else {
+      resultado = await _insightsService.gerarInsight(
+        transacoes: transacoes,
+        periodo: PeriodoEstatistica.mensal,
+      );
+    }
+    return resultado ?? estatistica.insights;
+  }
+
+  Future<EstatisticaSemanalModelo?> buscarSemanaPorId(String id) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+
+    final snapshot = await _firestore
+        .collection('Users')
+        .doc(uid)
+        .collection('Estatisticas')
+        .doc(id)
+        .get();
+
+    if (!snapshot.exists) return null;
+    return EstatisticaSemanalModelo.fromMap(snapshot.data()!);
+  }
+
+  Future<EstatisticaMensalModelo?> buscarMesPorId(String id) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+
+    final snapshot = await _firestore
+        .collection('Users')
+        .doc(uid)
+        .collection('Estatisticas')
+        .doc(id)
+        .get();
+
+    if (!snapshot.exists) return null;
+    return EstatisticaMensalModelo.fromMap(snapshot.data()!);
   }
 }
