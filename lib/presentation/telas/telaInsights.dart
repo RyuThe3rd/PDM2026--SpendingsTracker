@@ -392,6 +392,10 @@ class _TelaInsightsState extends State<TelaInsights> {
   }
 
   Widget _construirCardDePadroesDeGastos(Estatistica estatistica) {
+    final dados = (estatistica is EstatisticaSemanal)
+        ? estatistica.dadosDiarios
+        : (estatistica as EstatisticaMensal).dadosSemanais;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -416,7 +420,7 @@ class _TelaInsightsState extends State<TelaInsights> {
           SizedBox(
             height: 140,
             width: double.infinity,
-            child: CustomPaint(painter: LineChartPainter()),
+            child: CustomPaint(painter: LineChartPainter(dados)),
           ),
           const SizedBox(height: 15),
           Row(
@@ -447,32 +451,48 @@ class _TelaInsightsState extends State<TelaInsights> {
 }
 
 class LineChartPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final greenPaint = Paint()
-      ..color = Colors.green.shade400
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+final Map<String, dynamic>? dados;
 
-    final redPaint = Paint()
-      ..color = Colors.red.shade400
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+LineChartPainter(this.dados);
 
-    final greenPath = Path();
-    greenPath.moveTo(0, size.height * 0.75);
-    greenPath.cubicTo(size.width * 0.3, size.height * 0.5, size.width * 0.6, size.height * 0.6, size.width, size.height * 0.55);
+@override
+void paint(Canvas canvas, Size size) {
+  if (dados == null || dados!.isEmpty) return;
 
-    final redPath = Path();
-    redPath.moveTo(0, size.height * 0.9);
-    redPath.cubicTo(size.width * 0.4, size.height * 0.8, size.width * 0.7, size.height * 0.88, size.width, size.height * 0.8);
+  final greenPaint = Paint()..color = Colors.green.shade400..strokeWidth = 3..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
+  final redPaint = Paint()..color = Colors.red.shade400..strokeWidth = 3..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
 
-    canvas.drawPath(greenPath, greenPaint);
-    canvas.drawPath(redPath, redPaint);
+  final values = dados!.values.toList();
+  final stepX = size.width / (values.length - 1);
+
+  // Escala para os gráficos (normalização)
+  double maxVal = 1.0;
+  for (var v in values) {
+    if (v['depositado'] > maxVal) maxVal = v['depositado'].toDouble();
+    if (v['levantado'] > maxVal) maxVal = v['levantado'].toDouble();
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  final pathGreen = Path();
+  final pathRed = Path();
+
+  for (int i = 0; i < values.length; i++) {
+    double x = i * stepX;
+    double yGreen = size.height - (values[i]['depositado'] / maxVal * size.height);
+    double yRed = size.height - (values[i]['levantado'] / maxVal * size.height);
+
+    if (i == 0) {
+      pathGreen.moveTo(x, yGreen);
+      pathRed.moveTo(x, yRed);
+    } else {
+      pathGreen.lineTo(x, yGreen);
+      pathRed.lineTo(x, yRed);
+    }
+  }
+
+  canvas.drawPath(pathGreen, greenPaint);
+  canvas.drawPath(pathRed, redPaint);
+}
+
+@override
+bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
