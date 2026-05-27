@@ -8,6 +8,7 @@ export 'package:firebase_core/firebase_core.dart';
 export 'package:flutter/material.dart';
 export 'package:provider/provider.dart';
 export 'dart:convert';
+export 'package:intl/intl.dart' hide TextDirection;
 
 //1- Camada de Dominio
     //1.1 - entidades
@@ -30,6 +31,7 @@ export "package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/servicos
 export "package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/servicos/coletarTransacoes.dart";
 export "package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/servicos/calcularGastos.dart";
 export "package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/servicos/authService.dart";
+export "package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/servicos/servicoGerarPDF.dart";
 
 //2.2- Modelos
 export 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/modelos/transacoesModelo.dart';

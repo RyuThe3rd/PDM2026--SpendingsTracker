@@ -1,23 +1,22 @@
 import '../../listaDeImports.dart';
 
-class InsightModelo extends Insight {
-  InsightModelo({
-    required super.tipo,
-    required super.textoDoInsight,
+class InsightsModelo extends Insights {
+  InsightsModelo({
     required super.data,
+    super.dadosDeInsight,
   });
 
   Map<String, dynamic> toMap() => {
-    'tipo': tipo.name,
-    'textoDoInsight': textoDoInsight,
     'data': data,
+    'dadosDeInsight': dadosDeInsight?.map((key, value) => MapEntry(key.name, value)),
   };
 
-  factory InsightModelo.fromMap(Map<String, dynamic> map) {
-    return InsightModelo(
-      tipo: TipoDeInsight.values.byName(map['tipo']),
-      textoDoInsight: map['textoDoInsight'],
+  factory InsightsModelo.fromMap(Map<String, dynamic> map) {
+    return InsightsModelo(
       data: (map['data'] as Timestamp).toDate(),
+      dadosDeInsight: (map['dadosDeInsight'] as Map<String, dynamic>?)?.map(
+        (key, value) => MapEntry(TipoDeInsight.values.byName(key), value.toString()),
+      ),
     );
   }
 }

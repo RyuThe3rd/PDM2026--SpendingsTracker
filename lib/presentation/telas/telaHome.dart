@@ -1,6 +1,5 @@
 import '../../listaDeImports.dart';
 
-
 class TelaHome extends StatefulWidget {
   const TelaHome({super.key});
 
@@ -12,13 +11,16 @@ class _TelaHomeState extends State<TelaHome> {
   @override
   void initState() {
     super.initState();
-    // Sincronizar SMS ao iniciar a tela
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      //sim, State tem build context como uma variável
-      //consequentemente tem context mesmo fora do metodo build
-      final transacoesProvider = Provider.of<TransacoesProvider>(context, listen: false);
-      await transacoesProvider.transacoesRepo.sincronizarSms();
-      //transacoesProvider.atualizarTransacoes();
+      final tProvider = Provider.of<TransacoesProvider>(context, listen: false);
+      final eProvider = Provider.of<EstatisticaProvider>(context, listen: false);
+
+      // Sincroniza dados do dispositivo/repositório
+      await tProvider.transacoesRepo.sincronizarSms();
+      //tProvider.atualizarTransacoes();
+
+      // Gera os relatórios e insights baseados nas novas transações
+      await eProvider.carregarEstatisticas();
     });
   }
 
@@ -26,44 +28,35 @@ class _TelaHomeState extends State<TelaHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 248, 249, 254),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 23, 24, 106),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.account_balance, color: Colors.white, size: 20),
-          ),
-        ),
-        title: const Text(
-          "Finança Local",
-          style: TextStyle(color: Color.fromARGB(255, 23, 24, 106), fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Color.fromARGB(255, 23, 24, 106)),
-            onPressed: () {},
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildBalanceCard(),
+
+            Consumer<EstatisticaProvider>(
+              builder: (context, eProvider, _) => _buildBalanceCard(eProvider.semanaAtual),
+            ),
             const SizedBox(height: 25),
-            _buildChartSection(),
+
+            //Gráfico de Gastos Dinâmico
+            Consumer<EstatisticaProvider>(
+              builder: (context, eProvider, _) => _buildChartSection(eProvider.semanaAtual),
+            ),
             const SizedBox(height: 25),
-            _buildInsightCard(),
+            //Card de Insights da IA
+            Consumer<EstatisticaProvider>(
+              builder: (context, eProvider, _) => _buildInsightCard(eProvider.semanaAtual?.insights),
+            ),
             const SizedBox(height: 25),
             _buildRecentActivityHeader(),
             const SizedBox(height: 15),
-            _buildRecentActivityList(),
+
+            //Lista de Atividades Recentes
+            Consumer<TransacoesProvider>(
+              builder: (context, tProvider, _) => _buildRecentActivityList(tProvider.transacoes),
+            ),
           ],
         ),
       ),
@@ -71,7 +64,35 @@ class _TelaHomeState extends State<TelaHome> {
     );
   }
 
-  Widget _buildBalanceCard() {
+  AppBar _buildAppBar() {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 23, 24, 106),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(Icons.account_balance, color: Colors.white, size: 20),
+        ),
+      ),
+      title: const Text("Finança Local", style: TextStyle(color: Color.fromARGB(255, 23, 24, 106), fontWeight: FontWeight.bold)),
+      actions: [
+        IconButton(icon: const Icon(Icons.notifications_none, color: Color.fromARGB(255, 23, 24, 106)), onPressed: () {}),
+      ],
+    );
+  }
+
+  Widget _buildBalanceCard(EstatisticaSemanal? semana) {
+    // Busca o saldo 'final' do último dia registrado na semana
+    double saldoFinal = 0.0;
+    if (semana != null && semana.dadosDiarios!.isEmpty) {
+      final ultimoDia = semana.dadosDiarios?.values.last;
+      saldoFinal = (ultimoDia['final'] as num).toDouble();
+    }
+
     return Container(
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
@@ -81,25 +102,25 @@ class _TelaHomeState extends State<TelaHome> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "SALDO ATUAL",
-            style: TextStyle(color: Color.fromARGB(180, 255, 255, 255), fontSize: 12, fontWeight: FontWeight.bold),
-          ),
+          const Text("SALDO ATUAL", style: TextStyle(color: Colors.white60, fontSize: 12, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
-          const Row(
+          Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text("MT ", style: TextStyle(color: Color.fromARGB(150, 255, 255, 255), fontSize: 18)),
-              Text("12.450,00", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+              const Text("MT ", style: TextStyle(color: Colors.white54, fontSize: 18)),
+              Text(
+                NumberFormat("#,##0.00", "pt_PT").format(saldoFinal),
+                style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           const SizedBox(height: 25),
           Row(
             children: [
-              _buildSmallStatsCard(Icons.arrow_upward, "GANHOS", "4.200,00"),
+              _buildSmallStatsCard(Icons.arrow_upward, "GANHOS", semana?.valorGanho ?? 0.0),
               const SizedBox(width: 15),
-              _buildSmallStatsCard(Icons.arrow_downward, "GASTOS", "1.850,00", isNegative: true),
+              _buildSmallStatsCard(Icons.arrow_downward, "GASTOS", semana?.valorGasto ?? 0.0, isNegative: true),
             ],
           ),
         ],
@@ -107,39 +128,22 @@ class _TelaHomeState extends State<TelaHome> {
     );
   }
 
-  Widget _buildSmallStatsCard(IconData icon, String label, String value, {bool isNegative = false}) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(30, 255, 255, 255),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, size: 12, color: isNegative ? const Color.fromARGB(255, 255, 120, 120) : const Color.fromARGB(255, 120, 255, 120)),
-                const SizedBox(width: 5),
-                Text(label, style: const TextStyle(color: Color.fromARGB(180, 255, 255, 255), fontSize: 10, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Text(value, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget _buildChartSection(EstatisticaSemanal? semana) {
+    final dados = semana?.dadosDiarios ?? {};
 
-  Widget _buildChartSection() {
+    // Cálculo da escala do gráfico
+    double maxGasto = 1.0;
+    for (var d in dados.values) {
+      double levantado = (d['levantado'] as num).toDouble();
+      if (levantado > maxGasto) maxGasto = levantado;
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 5))],
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)]
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,32 +152,37 @@ class _TelaHomeState extends State<TelaHome> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text("Gráficos de\nGastos", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 23, 24, 106))),
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(color: const Color.fromARGB(255, 240, 240, 245), borderRadius: BorderRadius.circular(12)),
-                child: Row(
-                  children: [
-                    _buildTabButton("SEMANAL", true),
-                    _buildTabButton("MENSAL", false),
-                  ],
-                ),
-              ),
+              _buildToggleButtons(),
             ],
           ),
           const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              _buildBar("SEG", 0.4),
-              _buildBar("TER", 0.7),
-              _buildBar("QUA", 0.5),
-              _buildBar("QUI", 1.0, isHighlighted: true),
-              _buildBar("SEX", 0.65),
-              _buildBar("SÁB", 0.3),
-              _buildBar("DOM", 0.45),
-            ],
+            children: dados.isEmpty
+                ? [const Expanded(child: Center(child: Text("Processando estatísticas...", style: TextStyle(color: Colors.grey))))]
+                : dados.entries.map((e) {
+              double gastoDoDia = (e.value['levantado'] as num).toDouble();
+              return _buildBar(
+                  e.key.substring(0, 3).toUpperCase(),
+                  (gastoDoDia / maxGasto).clamp(0.1, 1.0),
+                  isHighlighted: DateFormat('EEEE').format(DateTime.now()) == _traduzirDia(e.key)
+              );
+            }).toList(),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleButtons() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: const Color.fromARGB(255, 240, 240, 245), borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        children: [
+          _buildTabButton("SEMANAL", true),
+          _buildTabButton("MENSAL", false),
         ],
       ),
     );
@@ -187,7 +196,7 @@ class _TelaHomeState extends State<TelaHome> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: active ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)] : [],
       ),
-      child: Text(text, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: active ? const Color.fromARGB(255, 23, 24, 106) : Colors.grey)),
+      child: Text(text, style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: active ? const Color.fromARGB(255, 23, 24, 106) : Colors.grey)),
     );
   }
 
@@ -196,7 +205,7 @@ class _TelaHomeState extends State<TelaHome> {
       children: [
         Container(
           height: 100 * heightFactor,
-          width: 30,
+          width: 25,
           decoration: BoxDecoration(
             color: isHighlighted ? const Color.fromARGB(255, 185, 215, 190) : const Color.fromARGB(255, 215, 215, 225),
             borderRadius: BorderRadius.circular(6),
@@ -208,36 +217,99 @@ class _TelaHomeState extends State<TelaHome> {
     );
   }
 
-  Widget _buildInsightCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 235, 236, 242),
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.lightbulb, color: Color.fromARGB(255, 23, 24, 106)),
-          const SizedBox(height: 10),
-          const Text("Dica do Mês", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 23, 24, 106))),
-          const SizedBox(height: 5),
-          const Text(
-            "Você economizou 15% a mais em transporte comparado ao mês passado.",
-            style: TextStyle(color: Color.fromARGB(255, 80, 80, 100), fontSize: 13),
-          ),
-          const SizedBox(height: 15),
-          Row(
-            children: [
-              const Text("VER INSIGHTS", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 23, 24, 106))),
-              const SizedBox(width: 5),
-              const Icon(Icons.arrow_forward, size: 14, color: Color.fromARGB(255, 23, 24, 106)),
-            ],
-          ),
-        ],
+  Widget _buildInsightCard(Insights? insight) {
+    if (insight == null || insight.dadosDeInsight == null || insight.dadosDeInsight!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Definimos uma prioridade para escolher qual insight mostrar na Home
+    // Ex: Alertas são mais importantes que Dicas.
+    final prioridade = [
+      TipoDeInsight.Alerta,
+      TipoDeInsight.Comportamento,
+      TipoDeInsight.Dica,
+      TipoDeInsight.Resumo,
+    ];
+
+    TipoDeInsight? tipoSelecionado;
+    for (var tipo in prioridade) {
+      if (insight.dadosDeInsight!.containsKey(tipo)) {
+        tipoSelecionado = tipo;
+        break;
+      }
+    }
+
+    // Caso não encontre nenhum da lista de prioridade, pega o primeiro disponível
+    tipoSelecionado ??= insight.dadosDeInsight!.keys.first;
+    final textoDoInsight = insight.dadosDeInsight![tipoSelecionado]!;
+
+    // Definir ícone baseado no tipo selecionado
+    IconData icon = Icons.lightbulb;
+    switch (tipoSelecionado) {
+      case TipoDeInsight.Alerta:
+        icon = Icons.warning_amber_rounded;
+        break;
+      case TipoDeInsight.Comportamento:
+        icon = Icons.trending_up;
+        break;
+      case TipoDeInsight.Dica:
+        icon = Icons.lightbulb_outline;
+        break;
+      case TipoDeInsight.Resumo:
+        icon = Icons.summarize_outlined;
+        break;
+    }
+
+    return GestureDetector(
+      onTap: () {
+        // SE o User for premium ele vai para a tela Insights
+        // Navigator.pushNamed(context, '/Insights');
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 235, 236, 242),
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: const Color.fromARGB(255, 23, 24, 106)),
+            const SizedBox(height: 10),
+            Text(
+              tipoSelecionado.name, // Exibe o nome do tipo (Alerta, Dica, etc)
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 23, 24, 106)
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              textoDoInsight,
+              style: const TextStyle(color: Colors.black54, fontSize: 13),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 15),
+            const Row(
+              children: [
+                Text(
+                  "VER INSIGHTS →",
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 23, 24, 106)
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
+
 
   Widget _buildRecentActivityHeader() {
     return Row(
@@ -249,61 +321,75 @@ class _TelaHomeState extends State<TelaHome> {
     );
   }
 
-  Widget _buildRecentActivityList() {
+  Widget _buildRecentActivityList(List<Transacoes> transacoes) {
+    final recentes = transacoes.reversed.take(3).toList();
+
     return Column(
-      children: [
-        _buildActivityItem("M-Pesa: Depósito", "14 de Out, 10:24", "+500 MT", "ENTRADA", true),
-        const SizedBox(height: 12),
-        _buildActivityItem("IZI: Levantamento", "13 de Out, 18:45", "-200 MT", "SAÍDA", false),
-        const SizedBox(height: 12),
-        _buildActivityItem("e-Mola: Pagamento", "12 de Out, 09:12", "-1.250 MT", "SAÍDA", false),
-      ],
+      children: recentes.isEmpty
+          ? [const Center(child: Text("Nenhuma transação encontrada.", style: TextStyle(color: Colors.grey)))]
+          : recentes.map((t) => _buildActivityItem(
+        title: "${t.fonte.name}: ${t.tipo.name}",
+        date: DateFormat('dd MMM, HH:mm').format(t.data),
+        amount: "${t.tipo == TipoTransacao.Levantamento ? '-' : '+'}${t.valor} MT",
+        isEntry: t.tipo == TipoTransacao.Deposito,
+      )).toList(),
     );
   }
 
-  Widget _buildActivityItem(String title, String date, String amount, String status, bool isEntry) {
+  Widget _buildActivityItem({required String title, required String date, required String amount, required bool isEntry}) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5, offset: const Offset(0, 2))],
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.01), blurRadius: 5)]),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 23, 24, 106),
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(color: const Color.fromARGB(255, 23, 24, 106), borderRadius: BorderRadius.circular(12)),
             child: const Icon(Icons.phone_android, color: Colors.white, size: 20),
           ),
           const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 23, 24, 106))),
-                Text(date, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(amount, style: TextStyle(fontWeight: FontWeight.bold, color: isEntry ? Colors.green : Colors.red)),
-              Text(status, style: TextStyle(color: isEntry ? Colors.green : Colors.red, fontSize: 9, fontWeight: FontWeight.bold)),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color.fromARGB(255, 23, 24, 106))),
+              Text(date, style: const TextStyle(color: Colors.grey, fontSize: 11)),
             ],
-          ),
+          )),
+          Text(amount, style: TextStyle(fontWeight: FontWeight.bold, color: isEntry ? Colors.green : Colors.red)),
         ],
       ),
     );
   }
 
+  Widget _buildSmallStatsCard(IconData icon, String label, double value, {bool isNegative = false}) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(15)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Icon(icon, size: 10, color: isNegative ? Colors.redAccent : Colors.greenAccent),
+              const SizedBox(width: 4),
+              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+            ]),
+            Text(value.toStringAsFixed(2), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _traduzirDia(String dia) {
+    const mapa = {'Segunda': 'Monday', 'Terça': 'Tuesday', 'Quarta': 'Wednesday', 'Quinta': 'Thursday', 'Sexta': 'Friday', 'Sábado': 'Saturday', 'Domingo': 'Sunday'};
+    return mapa[dia] ?? '';
+  }
+
   Widget _buildBottomNav() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),

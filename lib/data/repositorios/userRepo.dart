@@ -1,7 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/data/modelos/usuarioModelos.dart';
-import '../../dominio/contratos/interfaceAutenticacao.dart';
 import '../../listaDeImports.dart';
 
 class UserRepo implements InterfaceAutenticacao {

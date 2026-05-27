@@ -5,7 +5,7 @@ abstract class Estatistica {
   double valorGanho;
   double valorGasto;
   double diferencaComparativa;
-  Insight insight;
+  Insights insights;
   final PeriodoEstatistica periodo;
 
 
@@ -14,7 +14,7 @@ abstract class Estatistica {
     required this.valorGanho,
     required this.valorGasto,
     required this.diferencaComparativa,
-    required this.insight,
+    required this.insights,
     required this.periodo,
   });
 }
@@ -33,7 +33,7 @@ class EstatisticaSemanal extends Estatistica {
     required super.valorGanho,
     required super.valorGasto,
     required super.diferencaComparativa,
-    required super.insight,
+    required super.insights,
     this.semanaCounter,
     this.dadosDiarios,
     this.semanaAnteriorId,
@@ -81,7 +81,7 @@ class EstatisticaMensal extends Estatistica {
     required super.valorGanho,
     required super.valorGasto,
     required super.diferencaComparativa,
-    required super.insight,
+    required super.insights,
     required this.semanasDoMesIds,
     required this.dadosSemanais,
     this.mesAnteriorId,

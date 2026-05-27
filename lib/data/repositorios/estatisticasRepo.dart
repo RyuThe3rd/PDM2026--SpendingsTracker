@@ -35,7 +35,7 @@ class EstatisticasRepo implements InterfaceEstatisticas {
     e não sei como é que iria funcionar neste app baseado em login
    */
 
-  Future<Insight> gerarInsightSemanal(EstatisticaSemanalModelo estatistica) async {
+  Future<Insights> gerarInsightSemanal(EstatisticaSemanalModelo estatistica) async {
     // 1. Precisamos de buscar as transações da semana primeiro
     DateTime? inicio = estatistica.dataInicio; //data inicio é a segunda-feira de cada semana
     DateTime? fim = estatistica.dataFim; //data fim e data corrente serão a mesma variavel
@@ -52,10 +52,10 @@ class EstatisticasRepo implements InterfaceEstatisticas {
     snapshot.docs.map((doc) => doc.data()).toList();
 
     if (_transacoes.isEmpty) {
-      return Insight(
-          textoDoInsight: "Sem transações nesta semana.",
+      return Insights(
           data: DateTime.now(),
-          tipo: TipoDeInsight.Alerta);
+          dadosDeInsight: {TipoDeInsight.Alerta: "Sem transações nesta semana."}
+      );
     }
 
     final insight = await _insightsService.gerarInsight(
@@ -64,13 +64,16 @@ class EstatisticasRepo implements InterfaceEstatisticas {
       periodo: PeriodoEstatistica.semanal,
     );
 
-    estatistica.insight = insight!;
+    estatistica.insights = insight!;
     _firestore!.collection('Estatisticas').add(estatistica.toMap());
 
     return insight;
   }
 
-  Future<Insight> gerarInsightMensal(EstatisticaMensalModelo estatistica) async {
+  //existem tipos diferentes de insights
+  //Então não posso retornar só um insight
+  //mas talvez um Mapa com os diferentes tipos de Insight
+  Future<Insights> gerarInsightMensal(EstatisticaMensalModelo estatistica) async {
 
     final query = await _firestore!
         .collection('Users')
@@ -84,10 +87,17 @@ class EstatisticasRepo implements InterfaceEstatisticas {
     query.docs.map((doc) => doc.data()).toList();
 
    if (_transacoes.isEmpty) {
-      return Insight(
-          textoDoInsight: "Sem transações neste mês.",
-          data: DateTime.now(),
-          tipo: TipoDeInsight.Alerta);
+     //"textoDoInsight: "Sem transações neste mês.","
+     //isto já não existe porque no objeto Insight
+     //é suposto agora ter um Map de TipoDeInsight e textoDoInsight
+     //nome da variavel seria algo do tipo dadosDeInsight
+     //se não houverem transações guardadas no firestore
+     // vamos: 1- não renderizar o card de um insight ou simplesmente
+     // lançar qualquer insight que a IA nos dar
+     return Insights(
+         data: DateTime.now(),
+         dadosDeInsight: {TipoDeInsight.Alerta: "Sem transações neste mês."}
+     );
     }
 
     final insight = await _insightsService.gerarInsight(
@@ -96,8 +106,13 @@ class EstatisticasRepo implements InterfaceEstatisticas {
       periodo: PeriodoEstatistica.mensal,
     );
 
-    estatistica.insight = insight!;
-    _firestore!.collection('Estatisticas').add(estatistica.toMap());
+    estatistica.insights = insight!;
+    _firestore!
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('Estatisticas')
+        //Podemos filtrar o tipo (periodo) da estatistica com o where
+        .add(estatistica.toMap());
 
     return insight!;
   }

@@ -20,10 +20,10 @@ class EstatisticaProvider extends ChangeNotifier {
       diferencaComparativa: 0,
       dadosDiarios: {},
       semanaCounter: ((agora.day - 1) / 7).floor() + 1,
-      insight: InsightModelo(
-        textoDoInsight: "Sem insights",
+      insights: InsightsModelo(
+        //textoDoInsight: "Sem insights",
         data: agora,
-        tipo: TipoDeInsight.Alerta,
+        //tipo: TipoDeInsight.Alerta,
       ),
     );
 
@@ -35,10 +35,10 @@ class EstatisticaProvider extends ChangeNotifier {
       diferencaComparativa: 0,
       semanasDoMesIds: [],
       dadosSemanais: {},
-      insight: InsightModelo(
-        textoDoInsight: "Sem insights",
+      insights: InsightsModelo(
+        //textoDoInsight: "Sem insights",
         data: agora,
-        tipo: TipoDeInsight.Alerta,
+        //tipo: TipoDeInsight.Alerta,
       ),
     );
 

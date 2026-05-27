@@ -7,7 +7,7 @@ class EstatisticaSemanalModelo extends EstatisticaSemanal {
     required super.valorGanho,
     required super.valorGasto,
     required super.diferencaComparativa,
-    required super.insight,
+    required super.insights, //agora a classe se chama Insights mas deixa estar
     super.semanaCounter,
     super.semanaAnteriorId,
     super.dadosDiarios,
@@ -19,7 +19,7 @@ class EstatisticaSemanalModelo extends EstatisticaSemanal {
       'valorGanho': valorGanho,
       'valorGasto': valorGasto,
       'diferencaComparativa': diferencaComparativa,
-      'insight': (insight as InsightModelo).toMap(),
+      'insight': (insights as InsightsModelo).toMap(),
       'semanaCounter': semanaCounter,
       'semanaAnteriorId': semanaAnteriorId,
       'periodo': periodo.name,
@@ -34,7 +34,7 @@ class EstatisticaSemanalModelo extends EstatisticaSemanal {
       valorGanho: (map['valorGanho'] as num).toDouble(),
       valorGasto: (map['valorGasto'] as num).toDouble(),
       diferencaComparativa: (map['diferencaComparativa'] as num).toDouble(),
-      insight: InsightModelo.fromMap(map['insight']),
+      insights: InsightsModelo.fromMap(map['insight']),
       semanaCounter: map['semanaCounter'],
       semanaAnteriorId: map['semanaAnteriorId'],
     );

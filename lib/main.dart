@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/presentation/providers/transacoesProvider.dart';
 import 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/presentation/providers/userProvider.dart';
+import 'package:lecc_pdm_trabalho_pratico_agilio_manuel_rui_wilson/presentation/telas/telaInsights.dart';
 
 import 'listaDeImports.dart';
 
@@ -54,6 +55,7 @@ class MyApp extends StatelessWidget {
         '/Login' : (contexto) => TelaLogin(),
         '/Cadastro' : (contexto) => TelaCadastro(),
         '/Home' : (contexto) => TelaHome(),
+        '/Insights' : (contexto) => TelaInsights(),
       }
     );
   }

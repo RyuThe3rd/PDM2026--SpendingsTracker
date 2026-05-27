@@ -15,11 +15,13 @@ enum FonteTransacao{
   ContaMovel
 }
 
-enum TipoDeInsight{
-  Resumo,
-  Comportamento,
-  Alerta,
-  Dica,
+enum TipoDeInsight {
+  Investimento,    // Sugestão de Investimento
+  Orcamento,       // Gestão de Orçamento
+  Eficiencia,      // Eficiência Semanal/Mensal
+  Fluxo,           // Reflete "Comparação de Fluxo
+  Gastos,         // Padrões de Gastos vs Rendimentos
+  Alerta           // Para notificações críticas (sem transações)
 }
 
 enum TipoTransacao {
