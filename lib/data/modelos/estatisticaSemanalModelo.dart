@@ -1,16 +1,19 @@
 import '../../listaDeImports.dart';
 
 class EstatisticaSemanalModelo extends EstatisticaSemanal {
-
   EstatisticaSemanalModelo({
     required super.mes,
     required super.valorGanho,
     required super.valorGasto,
     required super.diferencaComparativa,
-    required super.insights, //agora a classe se chama Insights mas deixa estar
+    required super.insights,
     super.semanaCounter,
     super.semanaAnteriorId,
     super.dadosDiarios,
+    required super.criadoEm,
+    required super.weekId,
+    required super.dataInicio,
+    required super.dataFim,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,8 +26,11 @@ class EstatisticaSemanalModelo extends EstatisticaSemanal {
       'semanaCounter': semanaCounter,
       'semanaAnteriorId': semanaAnteriorId,
       'periodo': periodo.name,
-      'dataInicio': dataInicio?.toIso8601String(),
-      'dataFim': dataFim?.toIso8601String(),
+      'dataInicio': dataInicio,
+      'dataFim': dataFim,
+      'criadoEm': criadoEm,
+      'weekId': weekId,
+      'dadosDiarios': dadosDiarios,
     };
   }
 
@@ -37,6 +43,11 @@ class EstatisticaSemanalModelo extends EstatisticaSemanal {
       insights: InsightsModelo.fromMap(map['insight']),
       semanaCounter: map['semanaCounter'],
       semanaAnteriorId: map['semanaAnteriorId'],
+      criadoEm: (map['criadoEm'] as Timestamp).toDate(),
+      weekId: map['weekId'],
+      dataInicio: (map['dataInicio'] as Timestamp).toDate(),
+      dataFim: (map['dataFim'] as Timestamp).toDate(),
+      dadosDiarios: map['dadosDiarios'] != null ? Map<String, dynamic>.from(map['dadosDiarios']) : null,
     );
   }
 }

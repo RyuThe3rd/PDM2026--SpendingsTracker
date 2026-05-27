@@ -11,6 +11,8 @@ class EstatisticaMensalModelo extends EstatisticaMensal {
     required super.semanasDoMesIds,
     super.mesAnteriorId,
     required super.dadosSemanais,
+    required super.criadoEm,
+    required super.monthId,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,6 +27,8 @@ class EstatisticaMensalModelo extends EstatisticaMensal {
       'mesAnteriorId': mesAnteriorId,
       'dadosSemanais': dadosSemanais,
       'periodo': periodo.name,
+      'criadoEm': criadoEm,
+      'monthId': monthId,
     };
   }
 
@@ -39,6 +43,8 @@ class EstatisticaMensalModelo extends EstatisticaMensal {
       semanasDoMesIds: List<Map<int,dynamic>>.from(map['semanasDoMesIds']),
       mesAnteriorId: map['mesAnteriorId'],
       dadosSemanais: map['dadosSemanais'],
+      criadoEm: (map['criadoEm'] as Timestamp).toDate(),
+      monthId: map['monthId'],
     );
   }
 }

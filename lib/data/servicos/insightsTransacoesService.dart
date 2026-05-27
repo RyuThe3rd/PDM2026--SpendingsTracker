@@ -23,6 +23,67 @@ class InsightsTransacoesService {
     return gerarInsight(promptDeSistema: promptSistema,transacoes: transacoes, periodo: periodo)
   }
 
+  // Método especializado para gerar insights de comparação de fluxo
+  Future<Insights?> insightsDeFluxo({
+    required List<Map<String, dynamic>> transacoes,
+    required PeriodoEstatistica periodo,
+  }) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+
+    // 1- BUSCAR ESTATISTICAS ANTERIORES NO FIRESTORE
+    // Buscamos o último registro do mesmo período (semanal ou mensal) para comparar
+    final collection = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uid)
+        .collection('Estatisticas');
+
+    final queryAnterior = await collection
+        .where('periodo', isEqualTo: periodo.name)
+        .orderBy('mes', descending: true) // Ordenação simplificada por mês
+        .limit(1)
+        .get();
+
+    String dadosAnterioresStr = "Histórico: Primeiro período de análise, sem dados anteriores.";
+
+    if (queryAnterior.docs.isNotEmpty) {
+      final anterior = queryAnterior.docs.first.data();
+      // 3 - CONVERTER PARA STRING (Preparar contexto para a IA)
+      dadosAnterioresStr = '''
+      Resumo do Período Anterior:
+      - Total Ganho: ${anterior['valorGanho']} MT
+      - Total Gasto: ${anterior['valorGasto']} MT
+      - Diferença Acumulada: ${anterior['diferencaComparativa']} MT
+      ''';
+    }
+
+    // 4 - GERAR UMA PROMPT DE SISTEMA ESPECIALIZADA
+    final promptSistema = '''
+    Você é um consultor financeiro especialista em análise de fluxo e rácio de poupança.
+    Seu objetivo é comparar os dados atuais com o histórico anterior e gerar um insight motivador ou de alerta.
+    
+    DADOS HISTÓRICOS PARA COMPARAÇÃO:
+    $dadosAnterioresStr
+    
+    REGRAS DE RESPOSTA:
+    - Use as tags XML solicitadas.
+    - Foque na tag <Fluxo> para descrever se o rácio de poupança melhorou ou piorou.
+    - Se houver excedente, sugira algo na tag <Investimento>.
+    
+    FORMATO XML ESPERADO:
+    <Fluxo>Análise do rácio de poupança e comparação de fluxo aqui</Fluxo>
+    <Investimento>Sugestão baseada no fluxo atual</Investimento>
+    <Padroes>Observação sobre a consistência dos gastos</Padroes>
+    ''';
+
+    // 5 - PASSAR A PROMPT PARA O METODO gerarInsight GENERALIZADO
+    return gerarInsight(
+      promptDeSistema: promptSistema,
+      transacoes: transacoes,
+      periodo: periodo,
+    );
+  }
+
   Future<Insights?> gerarInsight({
     String? promptDeSistema,
     required List<Map<String, dynamic>> transacoes,

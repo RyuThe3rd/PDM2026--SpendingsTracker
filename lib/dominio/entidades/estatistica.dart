@@ -7,7 +7,7 @@ abstract class Estatistica {
   double diferencaComparativa;
   Insights insights;
   final PeriodoEstatistica periodo;
-
+  DateTime criadoEm;
 
   Estatistica({
     required this.mes,
@@ -16,17 +16,19 @@ abstract class Estatistica {
     required this.diferencaComparativa,
     required this.insights,
     required this.periodo,
+    required this.criadoEm,
   });
 }
 
 class EstatisticaSemanal extends Estatistica {
-  int? semanaCounter;//conta se é semana 1 à 4 de um mês
-  final String? semanaAnteriorId;
+  String weekId; // "2026-W22" 2026-Week 22
+  int? semanaCounter; // conta se é semana 1 à 4 de um mês
+  String? semanaAnteriorId;
   /// Dados detalhados de cada dia da semana (Segunda, Terça, etc.)
   /// { 'Segunda': { 'inicial': 0, 'levantado': 0, 'depositado': 0, 'final': 0 }, ... }
   Map<String, dynamic>? dadosDiarios;
-  DateTime? dataInicio; //data em que a semana corrente começou
-  DateTime? dataFim;//dia corrente da semana corrente até chegar no domingo
+  late DateTime dataInicio; // data em que a semana começou (Segunda-feira)
+  late DateTime dataFim; // data em que a semana terminou (Domingo ou dia atual se em curso)
 
   EstatisticaSemanal({
     required super.mes,
@@ -34,6 +36,8 @@ class EstatisticaSemanal extends Estatistica {
     required super.valorGasto,
     required super.diferencaComparativa,
     required super.insights,
+    required super.criadoEm,
+    required this.weekId,
     this.semanaCounter,
     this.dadosDiarios,
     this.semanaAnteriorId,
@@ -68,12 +72,13 @@ class EstatisticaSemanal extends Estatistica {
 }
 
 class EstatisticaMensal extends Estatistica {
+  String monthId; // "2026-05"
   final int ano;
-  final String? mesAnteriorId;
-  final List<Map<int,dynamic>> semanasDoMesIds;
+  String? mesAnteriorId;
+  final List<Map<int, dynamic>> semanasDoMesIds; // map[1] = idDaSemana1
+  final Map<String, dynamic> dadosSemanais;
   /// Dados detalhados de cada semana (Semana 1, Semana 2, etc.)
   /// { 'Semana 1': { 'inicial': 0, 'levantado': 0, 'depositado': 0, 'final': 0 }, ... }
-  final Map<String, dynamic> dadosSemanais;
 
   EstatisticaMensal({
     required super.mes,
@@ -82,6 +87,8 @@ class EstatisticaMensal extends Estatistica {
     required super.valorGasto,
     required super.diferencaComparativa,
     required super.insights,
+    required super.criadoEm,
+    required this.monthId,
     required this.semanasDoMesIds,
     required this.dadosSemanais,
     this.mesAnteriorId,
