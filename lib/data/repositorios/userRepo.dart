@@ -62,7 +62,9 @@ class UserRepo implements InterfaceAutenticacao {
         .update(dadosDePerfil);
 
     //atualiza password mesmo se não tiver realmente mudado
-    await _firebaseAuth.currentUser!.updatePassword(dadosDePerfil['senha']);
+    if (dadosDePerfil.containsKey('senha')) {
+      await _firebaseAuth.currentUser!.updatePassword(dadosDePerfil['senha']);
+    }
 
     return UsuarioModelo.fromMap(dadosDePerfil);
   }
@@ -103,5 +105,13 @@ class UserRepo implements InterfaceAutenticacao {
     for (var doc in estatisticas.docs) {
       await doc.reference.delete();
     }
+  }
+
+  @override
+  Future<void> tornarPremium(String uid) async {
+    await _firestore.collection('Users').doc(uid).update({
+      'premium': true,
+      'tipo': Tipo.UsuarioPremium.name,
+    });
   }
 }

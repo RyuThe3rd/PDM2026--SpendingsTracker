@@ -1,5 +1,3 @@
-
-
 //To Do: criar uma variável do tipo currentUser no userProvider
 import '../../listaDeImports.dart';
 
@@ -19,5 +17,7 @@ abstract interface class InterfaceAutenticacao {
   Future<bool> eliminarContaEDados();
 
   Future<void> eliminarUsuario(String uid) async {}
+
+  Future<void> tornarPremium(String uid);
 
 }

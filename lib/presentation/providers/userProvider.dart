@@ -49,6 +49,30 @@ class UserProvider extends ChangeNotifier {
     await _userRepo.eliminarUsuario(uid);
     notifyListeners();
   }
+
+  tornarPremium() async {
+    final uid = _currentUser?.uid;
+    if (uid != null) {
+      await _userRepo.tornarPremium(uid);
+      if (_usuario != null) {
+        _usuario!.premium = true;
+        _usuario!.tipo = Tipo.UsuarioPremium;
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> sincronizarPerfilComFirestore() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final doc = await FirebaseFirestore.instance.collection('Users').doc(uid).get();
+      if (doc.exists) {
+        _usuario = UsuarioModelo.fromMap(doc.data()!);
+        notifyListeners();
+      }
+    }
+  }
+
   set usuario(Usuario value) {
     _usuario = value;
   }
