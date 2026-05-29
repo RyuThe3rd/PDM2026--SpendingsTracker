@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: "${sistemaIdioma == 'pt' ?'Finança Local' : 'Spendings Tracker'}",
-      home: const TelaLogin(),
+      home: const TelaLoginCadastro(),
       routes: <String, WidgetBuilder>{
         '/Admin' : (contexto) => TelaAdmin(),
         '/User' : (contexto) => TelaUser(),

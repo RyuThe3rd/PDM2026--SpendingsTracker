@@ -99,8 +99,12 @@ class _TelaCadastroState extends State<TelaCadastro> {
           child: ElevatedButton(
             onPressed: () async {
               try {
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text.trim(),
-                    password: _passwordController.text.trim());
+                final dadosDePerfil = {"nome" : _nomeController.text.trim(),
+                                      "email" : _emailController.text.trim(),
+                                      "telefone": _phoneController.text.trim(),
+                                      "senha": _passwordController.text.trim()
+                };
+                await context.read<UserProvider>().criarUsuario(dadosDePerfil);
 
               } catch (e) {
                 if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));

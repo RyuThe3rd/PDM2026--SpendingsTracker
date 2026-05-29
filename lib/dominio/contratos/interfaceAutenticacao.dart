@@ -16,8 +16,8 @@ abstract interface class InterfaceAutenticacao {
   //há de editar atualizar o current user e atualizar por no firestore
   Future<bool> eliminarContaEDados();
 
-  Future<void> eliminarUsuario(String uid) async {}
+  Future<bool> eliminarUsuario(String uid);
 
-  Future<void> tornarPremium(String uid);
+  Future<bool> tornarPremium(String uid);
 
 }

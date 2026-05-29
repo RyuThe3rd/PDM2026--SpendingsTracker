@@ -50,6 +50,7 @@ class UserRepo implements InterfaceAutenticacao {
 
       return UsuarioModelo.fromMap(dadosDeRegisto);
     } catch (e) {
+      rethrow;
       return null;
     }
   }
@@ -76,7 +77,7 @@ class UserRepo implements InterfaceAutenticacao {
   }
 
   @override
-  Future<void> eliminarUsuario(String uid) async {
+  Future<bool> eliminarUsuario(String uid) async {
     try {
       /*
       Rui: Sobre o Firebase Auth:
@@ -89,6 +90,7 @@ class UserRepo implements InterfaceAutenticacao {
       await _eliminarDadosRelacionados(uid);
 
       print("Utilizador $uid e os seus dados foram eliminados com sucesso.");
+      return true;
     } catch (e) {
       print("Erro ao eliminar utilizador: $e");
       rethrow;
@@ -108,10 +110,15 @@ class UserRepo implements InterfaceAutenticacao {
   }
 
   @override
-  Future<void> tornarPremium(String uid) async {
-    await _firestore.collection('Users').doc(uid).update({
-      'premium': true,
-      'tipo': Tipo.UsuarioPremium.name,
-    });
+  Future<bool> tornarPremium(String uid) async {
+    try {
+      await _firestore.collection('Users').doc(uid).update({
+        'premium': true,
+        'tipo': Tipo.UsuarioPremium.name,
+      });
+      return true;
+    } catch (e) {
+      rethrow;
+    }
   }
 }

@@ -15,41 +15,47 @@ class UserProvider extends ChangeNotifier {
     /*cria e adiciona na firestore
     com uid do User do currentUser do firebase Auth
      */
-    await _userRepo.registar(dadosDePerfil);
+    try {
+      _usuario = await _userRepo.registar(dadosDePerfil);
+    }catch(e){
+      rethrow;
+    }
     //retorna UsuarioModel as Usuario
     // que depois é passado para o provider
     // e depois consumido na tela de Usuario
-    _usuario = usuario;
     notifyListeners();
   }
 
   editarUsuario(Map<String, dynamic> dadosDePerfil) async {
-    await _userRepo.editarPerfil(dadosDePerfil);
     //retorna UsuarioModel as Usuario
     // que depois é passado para o provider
     // e depois consumido na tela de Usuario
-    _usuario = usuario;
+    _usuario = await _userRepo.editarPerfil(dadosDePerfil);
     notifyListeners();
   }
 
-  removerUsuarioCorrente(Usuario usuario) async {
+  //isto é para a tela User
+  Future<bool> removerUsuarioCorrente(Usuario usuario) async {
 
     /*cria e adiciona na firestore
     com uid do User do currentUser do firebase Auth
      */
-    await _userRepo.eliminarContaEDados();
-    _usuario = usuario;
+    final temp = await _userRepo.eliminarContaEDados();
     notifyListeners();
+    return temp;
   }
 
-  removerUsuarioPorId(String uid) async {
+  //isso é para Admin usar na telaAdmin
+  Future<bool> removerUsuarioPorId(String uid) async {
     /*cria e adiciona na firestore
     com uid do User do currentUser do firebase Auth
      */
-    await _userRepo.eliminarUsuario(uid);
+    final temp = await _userRepo.eliminarUsuario(uid);
     notifyListeners();
+    return temp;
   }
 
+  //isto é para a telaUser
   tornarPremium() async {
     final uid = _currentUser?.uid;
     if (uid != null) {
